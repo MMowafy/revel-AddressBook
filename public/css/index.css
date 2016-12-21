@@ -1,0 +1,95 @@
+    .container {
+	width:40%;
+	margin:0 auto;
+	}
+.page-switcher button {
+	width:50%;
+	background:#966;
+	-webkit-box-shadow: 0px 0px 10px;
+	border:1px solid #CCC;
+	box-shadow: 5px 5px 10px;
+	transition:all 0.5s;
+	background: linear-gradient(to bottom, #966 1%,##5A2D2A 49%,#966 100%);
+	color:#f7f7f7;
+	padding:20px 0;
+	float:left;}
+.page-switcher button:hover {
+	cursor:pointer;
+	background:#933;}
+.btn-submit{
+	width:100%;
+	background:#966;
+	-webkit-box-shadow: 0px 0px 10px;
+	border:1px solid #CCC;
+	box-shadow: 5px 5px 10px;
+	transition:all 0.5s;
+	background: linear-gradient(to bottom, #966 1%,##5A2D2A 49%,#966 100%);
+	color:#f7f7f7;
+	padding:20px 0;
+}
+.btn-submit:hover {
+	cursor:pointer;
+	background:#933;}
+form{
+	background:#f7f7f7;
+	padding:20px;
+	box-sizing:border-box;
+	font-family:Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color:#900;
+		}
+	.form-group{
+		margin:25px 0;
+		}
+	.form-group label {
+			font-size:20px;
+			font-weight:400;
+			color:#900;
+		}
+	.form-group input {
+			display:block;
+			width:100%;
+			padding:13px;
+			box-sizing:border-box;
+			box-shadow:0 0 10px  #999 inset,0 0 0 #999;
+			border:1px solid #333;
+			margin-top:5px;
+			outline:none; /*to remove effect when focus on box */
+			transition:box-shadow 1s;
+		}
+	.form-group input:focus {
+			outline:1px solid #903;
+			box-shadow:0 0 0  #999 inset,0 0 10px #999 ;
+		}
+	#add-contact-container{
+		display:none;
+	}
+	#view-details-container{
+		display:none;}
+	.table {
+		width:100%;
+		border:1px solid #ccc;
+		border-collapse: collapse;
+		color:#666;
+	}
+	.table thead {
+		background:#CCC;
+		padding:25px;
+
+	}
+	.table thead th {
+	text-align:center;
+	cursor:pointer;}
+	.table thead:hover {
+	    background:#eee;
+	1}
+	.table td {
+		width:50%;
+	}
+	.table tbody tr {
+		height:50px;
+		text-align:center;
+		transition:background 0.5s;}
+	.table tbody tr:hover {
+	background:#933;
+	color:#f7f7f7;
+	}

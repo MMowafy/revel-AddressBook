@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forms</title>
+  <!-- Bootstrap core CSS -->
+  <link href="/public/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/public/css/index.css" rel="stylesheet">
+  <link href="/public/css/jumbotron.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- Custom styles for this template -->
+</head>
+
+<body>
+<div class="container">
+  <div class="header clearfix">
+    <nav>
+      <ul class="nav nav-pills float-xs-right">
+        <li class="nav-item">
+          <a class="nav-link active" href="/index">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/aboutus">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contactus">Contact</a>
+        </li>
+      </ul>
+    </nav>
+    <h3 class="text-muted">Home page</h3>
+  </div>
+  <header>
+    <div class="page-switcher">
+      <button onClick="showContactList()">Contact List</button>
+      <button onClick="showAddContact()">Add Contact</button>
+      <div style="clear:both"></div>
+    </div>
+  </header>
+  <!--//////start of add-contact  form/////-->
+  <div id="add-contact-container">
+    <form id="addcontact-form" onSubmit="return false">
+      <h2>Contact Information</h2>
+      <hr>
+      <div class="form-group">
+        <label for="contactname">Contact Name *</label>
+        <input type="text" id="contactname" required placeholder="Contact name" name="addressbookcontact.ContactName">
+      </div>
+      <div class="form-group">
+        <label for="phone-number">Phone Number *</label>
+        <input type="number" id="phone-number"  name="addressbookcontact.Phone" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email </label>
+        <input type="email" id="email"  placeholder="Contact Email" name="addressbookcontact.Email">
+      </div>
+      <div class="form-group">
+        <label for="country">Nationality </label>
+        <input list="country"  placeholder="please choose a country" name="addressbookcontact.Nationality">
+        <datalist id="country">
+          <option value="USA">USA</option>
+          <option value="Canada">Canada</option>
+          <option value="Egypt">Egypt</option>
+          <option value="Brazil">Brazil</option>
+        </datalist>
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="addressbookcontact.Address">
+      </div>
+      <div >
+        <input type="submit" value="Save Contact" class="btn-submit" onClick="AddToContacts()">
+      </div>
+    </form>
+  </div>
+  <!--///////////////End of add-contact form//////////////////-->
+
+  <!--/////////////////////////////start of view contacts container///////////////-->
+  <div id="contact-list-container">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th onClick="SortContacts('contactname')">Contact Name</th>
+
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody id="view-contact-body">
+
+      {{range .Contacts}}
+      <tr id="contact-row-{{.PK}}">
+        <td>{{.ContactName}}</td>
+        <td><button class="btn btn-default" onClick="ViewDetails({{.PK}})">View</button></td>
+        <td><button class="btn btn-danger" onClick="DeleteContact({{.PK}},1)">Delete</button></td>
+        <td><a class="open-AddPhoneModal btn btn-danger" data-toggle="modal" href="#add-phone-modal" data-id="{{.PK}}" data-nametitle="{{.ContactName}}">Add Number</a></td>
+      </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  <!--/////////////////////////////End of view contacts container///////////////-->
+
+  <!--//////////////start of pop up window to add new number///////////////-->
+  <div class="modal fade" id="add-phone-modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"  name="contactID" id="contactnameTitle" ></h4>
+        </div>
+        <div class="modal-body">
+          <form id="addnumber-form" >
+            <div class="form-group">
+              <input type="number" id="new-phone-number"  name="newnumber" required placeholder="Phone number">
+              <input type="hidden" name="contactID" id="contactID" value=""/>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" >Close</button>
+          <button type="submit" class="btn btn-danger" onClick="AddNumber()" >Save Contact</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--//////////////End of pop up window to add new number///////////////-->
+
+  <!--/////////////////////////////start of view details of contact container///////////////-->
+  <div id="view-details-container">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th >Contact Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>Nationality</th>
+        <th></th>
+
+      </tr>
+      </thead>
+      <tbody id="view-details-body">
+      {{range .ContactDetails}}
+      <tr id="details-row-{{.PK}}">
+        <td>{{.ContactName}}</td>
+        <td>{{.Phone}}</td>
+        <td>{{.Email}}</td>
+        <td>{{.Address}}</td>
+        <td>{{.Nationality}}</td>
+        <td><button class="btn btn-danger" onClick="DeleteContact({{.PK}},2)">Delete</button></td>
+      </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  <!--/////////////////////////////End of view-details of contact container///////////////-->
+</div>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="/public/js/index.js">
+</script>
+</body>
+
+</html>
