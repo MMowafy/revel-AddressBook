@@ -20,7 +20,7 @@ function showContactList(){
 			data:$("#addcontact-form").serialize(),
 			success: function(data) {
 				var contact=data;
-				$("#view-contact-body").append("<tr id='contact-row-" + contact.ContactName + "'><td>"+contact.ContactName+"</td> <td><button class='btn btn-default' onclick='ViewDetails("+contact.ContactName+","+contact.PartitionNumber+")'>View</button></td><td><button class='btn btn-danger' onclick='DeleteContact(" + contact.ContactName + ",1,"+contact.PartitionNumber+")'>Delete</button></td><td><a class='open-AddPhoneModal btn btn-danger' data-toggle='modal' href='#add-phone-modal' data-id="+contact.ContactName+">Add Number</a></td></tr>");
+				$("#view-contact-body").append("<tr id='contact-row-" + contact.PK + "'><td>"+contact.ContactName+"</td> <td><button class='btn btn-default' onclick='ViewDetails("+contact.PK+")'>View</button></td><td><button class='btn btn-danger' onclick='DeleteContact(" + contact.PK + ",1)'>Delete</button></td><td><a class='open-AddPhoneModal btn btn-danger' data-toggle='modal' href='#add-phone-modal' data-id="+contact.PK+">Add Number</a></td></tr>");
 				}
 			})
 		}
@@ -32,7 +32,7 @@ function showContactList(){
 			success: function(data) {
 				var contact=JSON.parse(data);
 				if(!contact) return;
-				$("#view-contact-body").append("<tr id='contact-row-" + contact.ContactName + "'><td>"+contact.ContactName+"</td> <td><button class='btn btn-default' onclick='ViewDetails("+contact.ContactName+","+contact.PartitionNumber+")'>View</button></td><td><button class='btn btn-danger' onclick='DeleteContact(" + contact.ContactName + ",1,"+contact.PartitionNumber+")'>Delete</button></td><td><a class='open-AddPhoneModal btn btn-danger' data-toggle='modal' href='#add-phone-modal' data-id="+contact.ContactName+">Add Number</a></td></tr>");
+				$("#view-contact-body").append("<tr id='contact-row-" + contact.PK + "'><td>"+contact.ContactName+"</td> <td><button class='btn btn-default' onclick='ViewDetails("+contact.PK+")'>View</button></td><td><button class='btn btn-danger' onclick='DeleteContact(" + contact.PK + ",1)'>Delete</button></td><td><a class='open-AddPhoneModal btn btn-danger' data-toggle='modal' href='#add-phone-modal' data-id="+contact.PK+">Add Number</a></td></tr>");
 				}
 			})
 	}
@@ -44,32 +44,32 @@ function showContactList(){
 				var searchResults=$("#view-contact-body");
 				searchResults.empty();
 				rawData.forEach(function(result){
-					var row = $("#view-contact-body").append("<tr id='contact-row-" + result.ContactName + "'><td>"+result.ContactName+"</td> <td><button class='btn btn-default' onclick='ViewDetails("+result.ContactName+"," + result.PartitionNumber + ")'>View</button></td><td><button class='btn btn-danger' onclick='DeleteContact(" + result.ContactName + ",1," + result.PartitionNumber + ")'>Delete</button></td><td><a class='open-AddPhoneModal btn btn-danger' data-toggle='modal' href='#add-phone-modal' data-id="+result.ContactName+">Add Number</a></td></tr>");
+					var row = $("#view-contact-body").append("<tr id='contact-row-" + result.PK + "'><td>"+result.ContactName+"</td> <td><button class='btn btn-default' onclick='ViewDetails("+result.PK+")'>View</button></td><td><button class='btn btn-danger' onclick='DeleteContact(" + result.PK + ",1)'>Delete</button></td><td><a class='open-AddPhoneModal btn btn-danger' data-toggle='modal' href='#add-phone-modal' data-id="+result.PK+">Add Number</a></td></tr>");
 					searchResults.append(row);
 				    });
 				}
 			})
 	}
-	function DeleteContact(contactname,number,partitionnumber) {
+	function DeleteContact(pk,number) {
         $.ajax({
           method: "POST",
-          url: "/index/DeleteContact?contactname="+contactname+"&number="+number+"&partitionnumber="+partitionnumber+"",
+          url: "/index/DeleteContact?pk="+pk+"&number="+number+"",
           success: function() {
-            $("#contact-row-" + contactname).remove();
-            $("#details-row-" + contactname).remove();
+            $("#contact-row-" + pk).remove();
+            $("#details-row-" + pk).remove();
           }
         });
       }
-     function ViewDetails(contactname,partitionnumber) {
+     function ViewDetails(pk) {
      $.ajax({
           method: "GET",
-          url: "/index/viewContactDetails?contactname="+contactname+"&partitionnumber="+partitionnumber+"",
+          url: "/index/viewContactDetails?pk=" + pk,
           success: function(rawData) {
                 showViewDetails();
 				var searchResults=$("#view-details-body");
 				searchResults.empty();
 				rawData.forEach(function(result){
-					var row = $("#view-details-body").append("<tr id='details-row-" + result.ContactName + "'><td>"+result.ContactName+"</td> <td>"+result.Phone+"</td><td>"+result.Email+"</td><td>"+result.Address+"</td><td>"+result.Nationality+"</td><td><button class='btn btn-danger' onclick='DeleteContact(" + result.ContactName + ",2,0)'>Delete</button></td></tr>");
+					var row = $("#view-details-body").append("<tr id='details-row-" + result.PK + "'><td>"+result.ContactName+"</td> <td>"+result.Phone+"</td><td>"+result.Email+"</td><td>"+result.Address+"</td><td>"+result.Nationality+"</td><td><button class='btn btn-danger' onclick='DeleteContact(" + result.PK + ",2)'>Delete</button></td></tr>");
 					searchResults.append(row);
 				    });
 				}

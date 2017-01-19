@@ -1,13 +1,13 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
-	"log"
-	"github.com/gocql/gocql"
+	_"github.com/go-sql-driver/mysql"
 )
 
 type AddressBookContact struct {
-	PartitionNumber gocql.UUID
+	PK          int
 	ContactName string
 	Email       string
 	Nationality string
@@ -15,94 +15,95 @@ type AddressBookContact struct {
 	Address     string
 }
 
-var session, err = getDB()
-
+var db, err = getDB()
 func GetContacts(sortby string) []AddressBookContact{
 
-
+	var rows *sql.Rows
 	var contacts []AddressBookContact
-	var contact  AddressBookContact
 
 	if err==nil {
 		if sortby =="contactname" || sortby =="phonenumber" {
 
-			/*
-			rows, err = session.Query("select distinct pk, contactname from addressbook inner join phonenumbers on pk=fk order by " + sortby)
-
+			rows, err = db.Query("select distinct pk, contactname from addressbook inner join phonenumbers on pk=fk order by " + sortby)
 			if err!=nil {
 				fmt.Println(err.Error())
-				*/
-			iter := session.Query(`select partitioNumber,contactname from addressbook order by co` ,).Iter()
-			for iter.Scan(&contact.PartitionNumber,&contact.ContactName) {
-				fmt.Println("cassandra contact :", contact.PartitionNumber,&contact.ContactName)
-				contacts =append(contacts,contact)
-			}
-			if err := iter.Close(); err != nil {
-				log.Fatal(err)
 			}
 		} else {
-			/*
-				rows, err  = session.Query("select distinct pk, contactname from addressbook inner join phonenumbers on pk=fk")
-				if err!=nil {
-					fmt.Println(err.Error())
-				}
-			*/
-			iter := session.Query(`select partitionNumber, contactname from addressbook`).Iter()
-			for iter.Scan(&contact.PartitionNumber,&contact.ContactName) {
-				fmt.Println("cassandra contact :", contact.PartitionNumber,&contact.ContactName)
-				contacts =append(contacts,contact)
-			}
-			if err := iter.Close(); err != nil {
-				log.Fatal(err)
+			rows, err  = db.Query("select distinct pk, contactname from addressbook inner join phonenumbers on pk=fk")
+			if err!=nil {
+				fmt.Println(err.Error())
 			}
 		}
+		for rows.Next() {
+			var contact AddressBookContact
+			rows.Scan(&contact.PK,&contact.ContactName, )
+			contacts = append(contacts, contact)
+		}
+		rows.Close()
 	}
-	fmt.Println("list of contacts to app = " , contacts)
 	return  contacts
-
-
 }
-
-func AddNumber(contactname string,phone string) error  {
-	result:=session.Query("insert into phonenumbers (contactname,phone_id,number) values (?,?,?)",contactname,gocql.TimeUUID(),phone)
-	fmt.Println(result)
-	var err error
+func AddNumber(pk string,phone string) error  {
+	_,err:=db.Exec("insert into phonenumbers (phone_id,fk,phonenumber) values (?,?,?)",nil,pk,phone)
 	return err
 }
-func ViewDetails(contactname string, partitionnumber string)  ([]AddressBookContact,error){
-	fmt.Println("in view details " , contactname, partitionnumber)
+func ViewDetails(pk string)  ([]AddressBookContact,error){
 	var contacts []AddressBookContact
-	var contact AddressBookContact
-	iter := session.Query("select contactname,email,nationality,address from addressbook where partitionNumeber=? and contactname=?",partitionnumber,contactname).Iter()
-	for iter.Scan(contact.PartitionNumber,&contact.ContactName) {
-		fmt.Println("cassandra contact :", contact.PartitionNumber,&contact.ContactName)
-		contacts =append(contacts,contact)
+	rows, err  := db.Query("select phone_id, contactname,email,nationality,address,phonenumber from addressbook inner join phonenumbers on pk=fk where pk="+pk)
+	if err != nil {
+		return contacts,err
 	}
-	if err := iter.Close(); err != nil {
-		log.Fatal(err)
+	for rows.Next() {
+		var contact AddressBookContact
+		rows.Scan(&contact.PK,&contact.ContactName,&contact.Email,&contact.Nationality,&contact.Address, &contact.Phone)
+		contacts = append(contacts, contact)
 	}
+	rows.Close()
 	return contacts,err
 }
-func Delete(contactname string, number string,partitionnumber string) error  {
+func Delete(pk string, number string) error  {
 	fmt.Println("this is delete method ",number)
 	var err error
 	if number=="1" {
-		session.Query("delete from addressbook where partitionNumber=? and contactname=?", partitionnumber,contactname)
+		if _, err = db.Exec("delete from addressbook where pk= ?", pk); err != nil {
+			return err
+		}
 	} else if number=="2" {
 		fmt.Println("here is 2")
-		 session.Query("delete from phonenumbers where contactname= ?", contactname)
+		var count int
+		if _, err = db.Exec("delete from phonenumbers where phone_id= ?", pk); err != nil {
+			return err
+		}
+		rows, err  := db.Query("select count(*) from addressbook inner join phonenumbers on pk=fk where pk="+pk)
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			rows.Scan(&count)
+		}
+		fmt.Println("number of records ==",count)
+
+
+		//w.WriteHeader(http.StatusOK)
 	}
 	return err
 }
 func AddContact(newContact AddressBookContact) (AddressBookContact,error) {
-	uuid:=gocql.TimeUUID()
 	var addContactToview AddressBookContact
-	session.Query("insert into addressbook (partitionNumber,contactname,email,nationality,address) values (?,?,?,?,?) ",uuid, newContact.ContactName, newContact.Email, newContact.Nationality, newContact.Address)
+	resultOfInsertion, err := db.Exec("insert into addressbook (pk,contactname,email,nationality,address) values (?,?,?,?,?) ",
+		nil, newContact.ContactName, newContact.Email, newContact.Nationality, newContact.Address)
+	if err != nil {
+		return addContactToview,err
+	}
+	primarykey, _ := resultOfInsertion.LastInsertId()
+	_,err=db.Exec("insert into phonenumbers (phone_id,fk,phonenumber) values (?,?,?)",
+		nil,primarykey,newContact.Phone)
+	if err != nil {
+		return addContactToview,err
+	}
 
-	session.Query("insert into phonenumbers (contactname,phone_id,phonenumber) values (?,?,?)",
-		newContact.ContactName,gocql.TimeUUID(),newContact.Phone)
 	addContactToview = AddressBookContact{
-		PartitionNumber:  uuid,
+		PK:          int(primarykey),
 		ContactName: newContact.ContactName,
 		Email:       newContact.Email,
 		Nationality: newContact.Nationality,

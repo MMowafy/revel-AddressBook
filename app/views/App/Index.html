@@ -91,11 +91,11 @@
       <tbody id="view-contact-body">
 
       {{range .Contacts}}
-      <tr id="contact-row-{{.ContactName}}">
+      <tr id="contact-row-{{.PK}}">
         <td>{{.ContactName}}</td>
-        <td><button class="btn btn-default" onClick="ViewDetails({{.ContactName}},{{.PartitionNumber}})">View</button></td>
-        <td><button class="btn btn-danger" onClick="DeleteContact({{.ContactName}},1,{{.PartitionNumber}})">Delete</button></td>
-        <td><a class="open-AddPhoneModal btn btn-danger" data-toggle="modal" href="#add-phone-modal" data-id="{{.ContactName}}" data-nametitle="{{.ContactName}}">Add Number</a></td>
+        <td><button class="btn btn-default" onClick="ViewDetails({{.PK}})">View</button></td>
+        <td><button class="btn btn-danger" onClick="DeleteContact({{.PK}},1)">Delete</button></td>
+        <td><a class="open-AddPhoneModal btn btn-danger" data-toggle="modal" href="#add-phone-modal" data-id="{{.PK}}" data-nametitle="{{.ContactName}}">Add Number</a></td>
       </tr>
       {{end}}
       </tbody>
@@ -144,13 +144,13 @@
       </thead>
       <tbody id="view-details-body">
       {{range .ContactDetails}}
-      <tr id="details-row-{{.ContactName}}">
+      <tr id="details-row-{{.PK}}">
         <td>{{.ContactName}}</td>
         <td>{{.Phone}}</td>
         <td>{{.Email}}</td>
         <td>{{.Address}}</td>
         <td>{{.Nationality}}</td>
-        <td><button class="btn btn-danger" onClick="DeleteContact({{.ContactName}},2,0)">Delete</button></td>
+        <td><button class="btn btn-danger" onClick="DeleteContact({{.PK}},2)">Delete</button></td>
       </tr>
       {{end}}
       </tbody>

@@ -44,13 +44,11 @@ func (c App) AddNumberToContact() revel.Result {
 	return c.Result
 }
 func (c App) ViewContactDetails() revel.Result  {
-	var contactname string
-	var partitionnumber string
+	var pk string
 	var ok error
 	var ContactDetails  []models.AddressBookContact
-	c.Params.Bind(&contactname,"contactname")
-	c.Params.Bind(&partitionnumber,"partitionnumber")
-	ContactDetails,ok=models.ViewDetails(contactname , partitionnumber )
+	c.Params.Bind(&pk,"pk")
+	ContactDetails,ok=models.ViewDetails(pk)
 	if ok!=nil {
 		fmt.Println(ok.Error())
 		c.RenderError(ok)
@@ -58,14 +56,12 @@ func (c App) ViewContactDetails() revel.Result  {
 	return c.RenderJson(ContactDetails)
 }
 func (c App) DeleteContact() revel.Result {
-	var contactname string
-	var partitionnumber string
+	var pk string
 	var number string
 	var ok error
-	c.Params.Bind(&contactname,"contactname")
+	c.Params.Bind(&pk,"pk")
 	c.Params.Bind(&number,"number")
-	c.Params.Bind(&partitionnumber,"partitionnumber")
-	ok=models.Delete(contactname,number,partitionnumber)
+	ok=models.Delete(pk,number)
 	if ok!=nil {
 		fmt.Println(ok.Error())
 		c.RenderError(ok)
