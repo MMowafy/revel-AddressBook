@@ -50,7 +50,7 @@ func (c App) ViewContactDetails() revel.Result  {
 	var ContactDetails  []models.AddressBookContact
 	c.Params.Bind(&contactname,"contactname")
 	c.Params.Bind(&partitionnumber,"partitionnumber")
-	ContactDetails,ok=models.ViewDetails(contactname , partitionnumber )
+	ContactDetails,ok=models.ViewDetails(contactname)
 	if ok!=nil {
 		fmt.Println(ok.Error())
 		c.RenderError(ok)
