@@ -86,10 +86,10 @@ func ViewDetails(contactname string)  ([]AddressBookContact,error){
 	var contact AddressBookContact
 	counter:=0
 	iter := session.Query("select phone_id,contactname,number,email,nationality,address from phones_by_user where contactname=?",contactname).Iter()
-	for iter.Scan(contact.PartitionNumber,&contact.ContactName,contact.Phone,&contact.Email,&contact.Nationality,&contact.Address) {
+	for iter.Scan(&contact.PartitionNumber,&contact.ContactName,&contact.Phone,&contact.Email,&contact.Nationality,&contact.Address) {
 		counter++
 		fmt.Println("counter" , strconv.Itoa(counter))
-		fmt.Println("cassandra contact :", contact.PartitionNumber,&contact.ContactName)
+		fmt.Println("cassandra contact :", &contact.PartitionNumber,&contact.ContactName)
 		contacts =append(contacts,contact)
 	}
 	err := iter.Close()
