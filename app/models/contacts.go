@@ -8,6 +8,7 @@ import (
 )
 
 type AddressBookContact struct {
+	PhoneID 	gocql.UUID
 	PartitionNumber gocql.UUID
 	ContactName string
 	Email       string
@@ -15,6 +16,7 @@ type AddressBookContact struct {
 	Phone       string
 	Address     string
 }
+type SortedContacts []AddressBookContact
 
 var session, err = getDB()
 
@@ -29,6 +31,7 @@ func GetContacts(sortby string) []AddressBookContact{
 			if err!=nil {
 				fmt.Println(err.Error())
 				*/
+
 			iter := session.Query(`select contact_id,contactname from addressbook ` ,).Iter()
 			for iter.Scan(&contact.PartitionNumber,&contact.ContactName) {
 				fmt.Println("cassandra contact :", contact.PartitionNumber,&contact.ContactName)
@@ -37,6 +40,9 @@ func GetContacts(sortby string) []AddressBookContact{
 			if err := iter.Close(); err != nil {
 				log.Fatal(err)
 			}
+
+
+
 		} else {
 			/*
 				rows, err  = session.Query("select distinct pk, contactname from addressbook inner join phonenumbers on pk=fk")
@@ -86,7 +92,7 @@ func ViewDetails(contactname string)  ([]AddressBookContact,error){
 	var contact AddressBookContact
 	counter:=0
 	iter := session.Query("select phone_id,contactname,number,email,nationality,address from phones_by_user where contactname=?",contactname).Iter()
-	for iter.Scan(&contact.PartitionNumber,&contact.ContactName,&contact.Phone,&contact.Email,&contact.Nationality,&contact.Address) {
+	for iter.Scan(&contact.PhoneID,&contact.ContactName,&contact.Phone,&contact.Email,&contact.Nationality,&contact.Address) {
 		counter++
 		fmt.Println("counter" , strconv.Itoa(counter))
 		fmt.Println("cassandra contact :", &contact.PartitionNumber,&contact.ContactName)
@@ -95,12 +101,12 @@ func ViewDetails(contactname string)  ([]AddressBookContact,error){
 	err := iter.Close()
 	return contacts,err
 }
-func Delete(contactname string, number string,partitionnumber string) error  {
+func Delete(contactname string, number string,id string) error  {
 	fmt.Println("this is delete method ",number)
 	batch:=gocql.NewBatch(gocql.LoggedBatch)
 	var err error
 	if number=="1" {
-		batch.Query("delete from addressbook where contact_id=? and contactname=?", partitionnumber,contactname)
+		batch.Query("delete from addressbook where contact_id=? and contactname=?", id,contactname)
 
 		batch.Query("delete from phonenumbers where contactname=?",contactname)
 
@@ -110,8 +116,8 @@ func Delete(contactname string, number string,partitionnumber string) error  {
 
 	} else if number=="2" {
 		fmt.Println("here is 2")
-		batch.Query("delete from phonenumbers where contactname=? and phone_id=?",contactname)
-		batch.Query("delete from phones_by_user where  contactname=? and phone_id=?",contactname)
+		batch.Query("delete from phonenumbers where contactname=? and phone_id=?",contactname,id)
+		batch.Query("delete from phones_by_user where  contactname=? and phone_id=?",contactname,id)
 		fmt.Println(batch)
 		err=session.ExecuteBatch(batch)
 	}
@@ -136,17 +142,6 @@ func AddContact(newContact AddressBookContact) (AddressBookContact,error) {
 		fmt.Println(err)
 		return addContactToview,err
 	}
-	/*
-	err:=session.Query("insert into addressbook (partitionNumber,contactname,email,nationality,address) values (?,?,?,?,?) ",contactIDuuid, newContact.ContactName, newContact.Email, newContact.Nationality, newContact.Address).Exec()
-	if err !=nil {
-		return addContactToview,err
-	}
-	err=session.Query("insert into phonenumbers (contactname,phone_id,number) values (?,?,?)",
-		newContact.ContactName,gocql.TimeUUID(),newContact.Phone).Exec()
-	if err !=nil {
-		return addContactToview,err
-	}
-	*/
 	addContactToview = AddressBookContact{
 		PartitionNumber:  contactIDuuid,
 		ContactName: newContact.ContactName,

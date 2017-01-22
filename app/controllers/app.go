@@ -59,13 +59,13 @@ func (c App) ViewContactDetails() revel.Result  {
 }
 func (c App) DeleteContact() revel.Result {
 	var contactname string
-	var partitionnumber string
+	var id string
 	var number string
 	var ok error
 	c.Params.Bind(&contactname,"contactname")
 	c.Params.Bind(&number,"number")
-	c.Params.Bind(&partitionnumber,"partitionnumber")
-	ok=models.Delete(contactname,number,partitionnumber)
+	c.Params.Bind(&id,"id")
+	ok=models.Delete(contactname,number,id)
 	if ok!=nil {
 		fmt.Println(ok.Error())
 		c.RenderError(ok)

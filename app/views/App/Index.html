@@ -150,7 +150,7 @@
         <td>{{.Email}}</td>
         <td>{{.Address}}</td>
         <td>{{.Nationality}}</td>
-        <td><button class="btn btn-danger" onClick="DeleteContact({{.ContactName}},2,0)">Delete</button></td>
+        <td><button class="btn btn-danger" onClick="DeleteContact({{.ContactName}},1,{{.PhoneID}})">Delete</button></td>
       </tr>
       {{end}}
       </tbody>
