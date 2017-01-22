@@ -91,7 +91,7 @@
       <tbody id="view-contact-body">
 
       {{range .Contacts}}
-      <tr id="contact-row-{{.ContactName}}">
+      <tr id="contact-row-{{.PartitionNumber}}">
         <td>{{.ContactName}}</td>
         <td><button class="btn btn-default" onClick="ViewDetails({{.ContactName}},{{.PartitionNumber}})">View</button></td>
         <td><button class="btn btn-danger" onClick="DeleteContact({{.ContactName}},1,{{.PartitionNumber}})">Delete</button></td>
